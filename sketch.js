@@ -1,7 +1,8 @@
 var cnv;
-var startPos = 25;
+var startPos = 250;
 var ballStartX;
 var ballStartY;
+var speedSlider;
 var ballMove = 0;
 var scoreOne = 0;
 var scoreTwo = 0;
@@ -17,10 +18,11 @@ function centerCanvas() {
 function setup() {
     cnv = createCanvas(600, 600);
     centerCanvas();
-
     one = new Paddle(startPos, "left");
     two = new Paddle(startPos, "right");
-    ball = new Ball(250, 250, 0.05);
+    ball = new Ball(300, 300, 3);
+    speedSlider = createSlider(0, 10, 4, 1);
+    pauseGame();
 }
 
 function draw() {
@@ -32,15 +34,15 @@ function draw() {
     two.display();
     movementOne();
     movementTwo();
+    console.log(ball.angleMove);
 }
 
-
 function movementOne() {
-    if(keyIsDown(DOWN_ARROW) && one.move <= 500) {
+    if(keyIsDown(S_KEY) && one.move <= 500) {
         one.down();
     }
 
-    if(keyIsDown(UP_ARROW) && one.move >= 0) {
+    if(keyIsDown(W_KEY) && one.move >= 0) {
         one.up();
     }
 }
@@ -52,11 +54,11 @@ function logToHTML() {
 }
 
 function movementTwo() {
-    if(keyIsDown(S_KEY) && two.move <= 500) {
+    if(keyIsDown(DOWN_ARROW) && two.move <= 500) {
         two.down();
     }
 
-    if(keyIsDown(W_KEY) && two.move >= 0) {
+    if(keyIsDown(UP_ARROW) && two.move >= 0) {
         two.up();
     }
 }
@@ -80,10 +82,6 @@ class Paddle {
         }
     }
 
-    angleMove() {
-
-    }
-
     down() {
         this.move += 10;
     }
@@ -93,34 +91,60 @@ class Paddle {
     }
 }
 
+function pauseGame() {
+    noLoop();
+}
+
+function playGame() {
+    loop();
+}
+
 class Ball {
     constructor(x, y, s){
         this.x = x;
         this.y = y;
         this.speed = s;
         this.lastHit = 0;
+        this.angleMove;
+        this.angle(-6, 6);
     }
 
     play() {
         this.direction();
         rect(this.x, this.y, 15, 15);
         this.hit();
+        this.sideHit(); 
+    }
+    
+    angle(min, max) {
+        this.angleMove = random(min, max);
     }
     
     direction() {
         switch(this.lastHit){
             case 1:
-                this.x++;
+                this.x += speedSlider.value();
+                this.y += this.angleMove;
                 break;
             case 0:
-                this.x--;
+                this.x -= speedSlider.value();
+                this.y -= this.angleMove;
                 break;
         }
     }
 
     hit() {
-        if(this.x == 55 && this.y >= one.move && this.y <= one.move + 95) this.lastHit = 1;
-        if(this.x == 530 && this.y >= two.move && this.y <= two.move + 95) this.lastHit = 0;
+        if(this.x <= 55 && this.x >= 45 && this.y >= one.move && this.y <= one.move + 95) {this.lastHit = 1; this.angle(-6, 6)}
+        if(this.x <= 530 && this.x >= 520 &&this.y >= two.move && this.y <= two.move + 95) {this.lastHit = 0; this.angle(-6, 6)}
+    }
+
+    sideHit() {
+        // if(this.y <= 0) {if(this.angleMove >= 3) this.angleMove / 2}
+        // else if(this.y >= 600) {if(this.angleMove <= 0) this.angleMove * 2}
+        if(this.y <= 0 || this.y >= 600){
+            if(this.anglMove <= 6) {this.angle(-6, 6); console.log("TIMES!");}
+            else if(this.angleMove >= -6) {this.angle(-6, 6); console.log("DIVIDE");}
+        } 
     }
 
     scoreSystem() {
@@ -134,6 +158,7 @@ class Ball {
     restart(player) {
         this.x = 300;
         this.y = 300;
+        this.angle();
         if(player == "1") {
             scoreOne += 1;
             score();
