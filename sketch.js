@@ -1,11 +1,7 @@
 var cnv;
 var startPos = 250;
-var ballStartX;
-var ballStartY;
-var speedSlider;
-var ballMove = 0;
-var scoreOne = 0;
-var scoreTwo = 0;
+var ballStartY, ballStartX, speedSlider;
+var ballMove, scoreOne, scoreTwo = 0;
 const W_KEY = 87;
 const S_KEY = 83;
 
@@ -139,11 +135,8 @@ class Ball {
     }
 
     sideHit() {
-        // if(this.y <= 0) {if(this.angleMove >= 3) this.angleMove / 2}
-        // else if(this.y >= 600) {if(this.angleMove <= 0) this.angleMove * 2}
         if(this.y <= 0 || this.y >= 600){
-            if(this.anglMove <= 6) {this.angle(-6, 6); console.log("TIMES!");}
-            else if(this.angleMove >= -6) {this.angle(-6, 6); console.log("DIVIDE");}
+            if(this.anglMove <= 6 || this.angleMove >= -6) {this.angle(-6, 6); console.log("TIMES!");}
         } 
     }
 
